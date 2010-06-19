@@ -3,10 +3,14 @@ package graphics;
 import java.awt.Button;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.TextArea;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+
+import net.HexConnector;
 
 public class Gui extends Frame implements WindowListener, ActionListener{
 
@@ -15,16 +19,57 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	Button pushButton;
+	Button sendButton;
+	Button quitButton;
+	Button hostButton;
+	Button joinButton;
+	TextField hostName;
+	TextField portNum;
+	TextField sendText;
+	TextArea dataText;
+	GuiUpdater guiUpdater;
 	
+	
+	HexConnector connector; // Only here to test functionality -- should be in "game" class
 
 	//Constructor
 	public Gui(String s) {
-		super(s); // construct Frame part of Gui		
+		super(s); // construct Frame part of Gui	
+		connector = new HexConnector();
 		setLayout(new FlowLayout());
-		pushButton = new Button("press me");
-		add(pushButton);
-		pushButton.addActionListener(this);
+		
+		quitButton = new Button("quit");
+		add(quitButton);
+		quitButton.addActionListener(this);
+		
+		hostName = new TextField("Enter Hostname");
+		add(hostName);
+		
+		portNum = new TextField("4444");
+		add(portNum);
+		
+		joinButton = new Button("Join");
+		add(joinButton);
+		joinButton.addActionListener(this);
+		
+		hostButton = new Button("Host");
+		add(hostButton);
+		hostButton.addActionListener(this);
+		
+		dataText = new TextArea("");
+		add(dataText);
+		
+		sendText = new TextField("Enter Text Here");
+		add(sendText);
+		sendText.addActionListener(this);
+		
+		sendButton = new Button("Send");
+		add(sendButton);
+		sendButton.addActionListener(this);
+		
+		
+		guiUpdater = new GuiUpdater(dataText,connector);
+		
 	}
 
 
@@ -32,8 +77,26 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		
-			if(e.getSource() == pushButton){
+			if(e.getSource() == quitButton){
+				connector.closeConnections();
 				System.exit(0);
+			}
+			if(e.getSource() == joinButton){
+				dataText.append("Attempting to join: " + hostName.getText() + " on port: " + portNum.getText());
+				connector.setHosted(false);
+				connector.launch(hostName.getText(), Integer.parseInt(portNum.getText()));
+				guiUpdater.start();
+			}
+			if(e.getSource() == hostButton){
+				dataText.append("Waiting for connection on port: " + portNum.getText());
+				connector.setHosted(true);
+				connector.launch(hostName.getText(), Integer.parseInt(portNum.getText()));
+				guiUpdater.start();
+			}
+			if((e.getSource() == sendButton)||((e.getSource() == sendText))){
+				connector.send(sendText.getText());
+				dataText.append(sendText.getText() + "\n");
+				sendText.setText("");
 			}
 	}
 
