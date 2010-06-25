@@ -15,6 +15,9 @@ import game.Game;
 import net.IncomingDataHandler;
 import net.HexConnector;
 
+/*
+ * This is the primary pre-game UI. It also handles mouse events and passes them into the Game Updater.
+ */
 public class Gui extends Frame implements WindowListener, ActionListener{
 
 	/**

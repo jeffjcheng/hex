@@ -12,7 +12,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
 public class HexConnector {
@@ -22,22 +21,26 @@ public class HexConnector {
 	boolean isHosted;
 
 	public HexConnector() {
-		
+
 	}
 
-	public void setHosted(boolean isHosted){
+	public void setHosted(boolean isHosted) {
 		this.isHosted = isHosted;
 	}
+
 	public boolean launch(String name, int portNumber) {
 		if (!isHosted) {
 			try {
-				System.out.println("HexConnector::(Client)Trying to create socket");
+				System.out
+						.println("HexConnector::(Client)Trying to create socket");
 				MySocket = new Socket();
-				MySocket.connect(new InetSocketAddress(InetAddress.getByName(name),portNumber));
+				MySocket.connect(new InetSocketAddress(InetAddress
+						.getByName(name), portNumber));
 				System.out.println("HexConnector::(Client)Socket Created");
 				MyConnection = new SocketAction(MySocket);
 				MyConnection.start();
-				System.out.println("HexConnector::(Client)MyConnection Thread Started");
+				System.out
+						.println("HexConnector::(Client)MyConnection Thread Started");
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -49,13 +52,15 @@ public class HexConnector {
 			}
 		} else {
 			try {
-				System.out.println("HexConnector::(Host)Trying to create socket");
+				System.out
+						.println("HexConnector::(Host)Trying to create socket");
 				MyServerSocket = new ServerSocket(portNumber);
 				MySocket = MyServerSocket.accept();
 				System.out.println("HexConnector::(Host)Socket Created");
 				MyConnection = new SocketAction(MySocket);
 				MyConnection.start();
-				System.out.println("HexConnector::(Host)MyConnection Thread Started");
+				System.out
+						.println("HexConnector::(Host)MyConnection Thread Started");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -75,7 +80,9 @@ public class HexConnector {
 	}
 
 	public void closeConnections() {
-		MyConnection.closeConnections();
+		if (MyConnection != null) {
+			MyConnection.closeConnections();
+		}
 	}
 
 	public boolean isConnected() {
