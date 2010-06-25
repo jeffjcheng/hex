@@ -10,18 +10,22 @@ import java.net.*;
 import java.io.*;
 
 class SocketAction extends Thread {
-  private DataInputStream inStream = null;
-  protected PrintStream   outStream = null;
+  private ObjectInputStream inStream = null;
+  private ObjectOutputStream   outStream = null;
   private Socket          socket = null;
 
+  public SocketAction() {}
   public SocketAction(Socket sock) {
-    super("SocketAction");
+    //super("SocketAction");
+	  socket = sock;
     try {
-      inStream = new DataInputStream(new
-        BufferedInputStream(sock.getInputStream(), 1024));
-      outStream = new PrintStream(new
-        BufferedOutputStream(sock.getOutputStream(), 1024), true);
-      socket = sock;
+    	
+    	//Java is evil...
+      outStream = new ObjectOutputStream(socket.getOutputStream());
+      InputStream preInStream = socket.getInputStream();
+      inStream = new ObjectInputStream(preInStream);
+      System.out.println("SocketAction::ObjectStreams Created");
+      
     }
     catch (IOException e) {
       System.out.println("Couldn't initialize SocketAction: " + e);
@@ -32,12 +36,19 @@ class SocketAction extends Thread {
   public void run() {
   }
 
-  public void send(String s) {
-    outStream.println(s);
+  public void send(Object s) {
+    //outStream.println(s);
+	  try {
+		outStream.writeObject(s);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
   }
 
-  public String receive() throws IOException {
-    return inStream.readLine();
+  public Object receive() throws IOException, ClassNotFoundException {
+    //return inStream.readLine();
+	  return inStream.readObject();
   }
 
   public void closeConnections() {
@@ -51,6 +62,7 @@ class SocketAction extends Thread {
   }
 
   public boolean isConnected() {
+	  System.out.println("SocketAction::IsConnected Called");
     return ((inStream != null) && (outStream != null) &&
       (socket != null));
     }

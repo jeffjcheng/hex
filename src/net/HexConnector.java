@@ -7,10 +7,11 @@ package net;
  * 
  */
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.*;
-import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class HexConnector {
 	SocketAction MyConnection;
@@ -28,10 +29,12 @@ public class HexConnector {
 	public boolean launch(String name, int portNumber) {
 		if (!isHosted) {
 			try {
-
+				System.out.println("HexConnector::(Client)Trying to create socket");
 				MySocket = new Socket(name, portNumber,InetAddress.getLocalHost(),12367);
+				System.out.println("HexConnector::(Client)Socket Created");
 				MyConnection = new SocketAction(MySocket);
 				MyConnection.start();
+				System.out.println("HexConnector::(Client)MyConnection Thread Started");
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -43,10 +46,13 @@ public class HexConnector {
 			}
 		} else {
 			try {
+				System.out.println("HexConnector::(Host)Trying to create socket");
 				MyServerSocket = new ServerSocket(portNumber);
 				MySocket = MyServerSocket.accept();
+				System.out.println("HexConnector::(Host)Socket Created");
 				MyConnection = new SocketAction(MySocket);
 				MyConnection.start();
+				System.out.println("HexConnector::(Host)MyConnection Thread Started");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -57,11 +63,11 @@ public class HexConnector {
 		return true;
 	}
 
-	public void send(String s) {
+	public void send(Object s) {
 		MyConnection.send(s);
 	}
 
-	public String receive() throws IOException {
+	public Object receive() throws IOException, ClassNotFoundException {
 		return MyConnection.receive();
 	}
 
