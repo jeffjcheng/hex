@@ -9,8 +9,10 @@ package net;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
 public class HexConnector {
@@ -30,7 +32,8 @@ public class HexConnector {
 		if (!isHosted) {
 			try {
 				System.out.println("HexConnector::(Client)Trying to create socket");
-				MySocket = new Socket(name, portNumber,InetAddress.getLocalHost(),12367);
+				MySocket = new Socket();
+				MySocket.connect(new InetSocketAddress(InetAddress.getByName(name),portNumber));
 				System.out.println("HexConnector::(Client)Socket Created");
 				MyConnection = new SocketAction(MySocket);
 				MyConnection.start();
