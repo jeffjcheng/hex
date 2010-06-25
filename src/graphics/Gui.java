@@ -10,6 +10,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import game.Game;
+
+import net.IncomingDataHandler;
 import net.HexConnector;
 
 public class Gui extends Frame implements WindowListener, ActionListener{
@@ -27,14 +30,18 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 	TextField portNum;
 	TextField sendText;
 	TextArea dataText;
-	GuiUpdater guiUpdater;
+	IncomingDataHandler guiUpdater;
+	Game game;
 	
 	
 	HexConnector connector; // Only here to test functionality -- should be in "game" class
 
 	//Constructor
-	public Gui(String s) {
+	public Gui(String s,Game game) {
 		super(s); // construct Frame part of Gui	
+		this.game = game;
+		
+		
 		connector = new HexConnector();
 		setLayout(new FlowLayout());
 		
@@ -42,7 +49,7 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 		add(quitButton);
 		quitButton.addActionListener(this);
 		
-		hostName = new TextField("Enter Hostname");
+		hostName = new TextField("localhost");
 		add(hostName);
 		
 		portNum = new TextField("4444");
@@ -68,7 +75,7 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 		sendButton.addActionListener(this);
 		
 		
-		guiUpdater = new GuiUpdater(dataText,connector);
+		guiUpdater = new IncomingDataHandler(game,this.connector);
 		
 	}
 
@@ -88,13 +95,17 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 				guiUpdater.start();
 			}
 			if(e.getSource() == hostButton){
+				System.out.println("Gui::Host Button Clicked");
 				dataText.append("Waiting for connection on port: " + portNum.getText());
 				connector.setHosted(true);
 				connector.launch(hostName.getText(), Integer.parseInt(portNum.getText()));
+				System.out.println("Gui::Connector Launched");
 				guiUpdater.start();
+				System.out.println("Gui::GuiUpdater Thread Started");
 			}
 			if((e.getSource() == sendButton)||((e.getSource() == sendText))){
-				connector.send(sendText.getText());
+				game.setMyString("hello");
+				connector.send(game);
 				dataText.append(sendText.getText() + "\n");
 				sendText.setText("");
 			}
