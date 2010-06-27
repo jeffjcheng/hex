@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import core.GameUpdater;
+import core.GameManager;
 
 /*
  * This is the primary pre-game UI. It also handles mouse events and passes them into the Game Updater.
@@ -29,19 +29,19 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 	TextField hostName;
 	TextField portNum;
 	TextField sendText;
-	TextArea dataText;
+	public TextArea dataText;
 	
-	GameUpdater gameUpdater;
+	GameManager gameManager;
 	GraphicsUpdater graphicsUpdater;
 	
 	
 	
 
 	//Constructor
-	public Gui(String s, GameUpdater gameUpdater) {
+	public Gui(String s, GameManager gameUpdater) {
 		super(s); // construct Frame part of Gui	
-		this.gameUpdater = gameUpdater;
-		this.graphicsUpdater = new GraphicsUpdater(gameUpdater);
+		this.gameManager = gameUpdater;
+		this.graphicsUpdater = new GraphicsUpdater(gameUpdater,this);
 		
 		setLayout(new FlowLayout());
 		
@@ -85,34 +85,37 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 		// TODO Auto-generated method stub
 		
 			if(e.getSource() == quitButton){
-				gameUpdater.CloseConnections();
+				gameManager.CloseConnections();
 				System.exit(0);
 			}
 			if(e.getSource() == joinButton){
-				dataText.append("Gui::Join Button Clicked");
-				if(gameUpdater.JoinGame(hostName.getText(),Integer.parseInt(portNum.getText()))){
-					this.dataText.append("Game joined successfully");
+				System.out.println("Gui::Join Button Clicked");
+				this.dataText.append("\nTrying to join game on @ " + hostName.getText() + ":" + Integer.parseInt(portNum.getText()));
+				if(gameManager.JoinGame(hostName.getText(),Integer.parseInt(portNum.getText()))){
+					this.dataText.append("\nGame joined successfully");
+					graphicsUpdater.start();
 					this.joinButton.setEnabled(false);
 					this.hostButton.setEnabled(false);
 				}else{
-					this.dataText.append("Joining game failed!");
+					this.dataText.append("\nJoining game failed!");
 				}
 			}
 			if(e.getSource() == hostButton){
 				System.out.println("Gui::Host Button Clicked");
-				if(gameUpdater.HostGame(hostName.getText(), Integer.parseInt(portNum.getText()))){
-					this.dataText.append("Game Hosted Successfully");
+				this.dataText.append("\nTrying to host game on port: " + Integer.parseInt(portNum.getText()));
+				if(gameManager.HostGame(hostName.getText(), Integer.parseInt(portNum.getText()))){
+					this.dataText.append("\nGame Hosted Successfully");
+					graphicsUpdater.start();
 					this.joinButton.setEnabled(false);
 					this.hostButton.setEnabled(false);
 				}else{
-					this.dataText.append("Game Host Failed!");
+					this.dataText.append("\nGame Host Failed!");
 				}
 				
 				
 			}
 			if((e.getSource() == sendButton)||((e.getSource() == sendText))){
-				gameUpdater.SendText(sendText.getText());
-				dataText.append(sendText.getText() + "\n");
+				gameManager.SendText(sendText.getText());
 				sendText.setText("");
 			}
 	}

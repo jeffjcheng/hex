@@ -3,34 +3,36 @@ package net;
 import game.Game;
 import java.io.IOException;
 
-import core.GameUpdater;
+import core.GameManager;
 
-public class IncomingDataHandler extends Thread{
+public class IncomingDataHandler extends Thread {
 	HexConnecter hexConnecter;
-	GameUpdater gameUpdater;
-	Game game;
-	public IncomingDataHandler(GameUpdater gameUpdater, Game game, HexConnecter connector){
-		this.gameUpdater = gameUpdater;
+	GameManager gameManager;
+
+	public IncomingDataHandler(GameManager gameUpdater, HexConnecter connector) {
+		this.gameManager = gameUpdater;
 		this.hexConnecter = connector;
-		this.game = game;
 	}
-	
-	public void run(){
-			while (hexConnecter.isConnected()){
-				try {
-					gameUpdater.UpdateGame((Game)hexConnecter.receive());
-					if(game == null){break;}
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
+	public void run() {
+		while (hexConnecter.isConnected()) {
+			try {
+				System.out.println("IncomingDataHandler:run:Waiting for data:");
+				gameManager.setGame((Game) hexConnecter.receive());
+				if (gameManager.getGame() == null) {
+					System.out.println("IncomingDataHandler::IncomingGame is null");
+					throw new IOException();
 				}
-				System.out.println("Data Received: ");
-				System.out.println(game.getMyString());
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.exit(1);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			System.out.println("IncomingDataHandler::Data Received");
+		}
 	}
-	
+
 }
