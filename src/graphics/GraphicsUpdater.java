@@ -1,4 +1,7 @@
 package graphics;
+
+import core.GameUpdater;
+
 /*
  * This class/Thread handles the drawing of the main in-game UI
  * 
@@ -7,4 +10,8 @@ package graphics;
  */
 public class GraphicsUpdater extends Thread {
 
+	GameUpdater gameUpdater;
+	public GraphicsUpdater(GameUpdater gameUpdater){
+		this.gameUpdater = gameUpdater;
+	}
 }

@@ -3,19 +3,22 @@ package net;
 import game.Game;
 import java.io.IOException;
 
+import core.GameUpdater;
+
 public class IncomingDataHandler extends Thread{
-	HexConnector connector;
+	HexConnecter hexConnecter;
+	GameUpdater gameUpdater;
 	Game game;
-	public IncomingDataHandler(Game game, HexConnector connector){
-		
-		this.connector = connector;
+	public IncomingDataHandler(GameUpdater gameUpdater, Game game, HexConnecter connector){
+		this.gameUpdater = gameUpdater;
+		this.hexConnecter = connector;
 		this.game = game;
 	}
 	
 	public void run(){
-			while (connector.isConnected()){
+			while (hexConnecter.isConnected()){
 				try {
-					game = (Game)connector.receive();
+					gameUpdater.UpdateGame((Game)hexConnecter.receive());
 					if(game == null){break;}
 					
 				} catch (IOException e) {
@@ -30,7 +33,4 @@ public class IncomingDataHandler extends Thread{
 			}
 	}
 	
-	/*synchronized void updateState(String s){
-		dataText.append(s);
-	}*/
 }

@@ -14,13 +14,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class HexConnector {
+public class HexConnecter {
 	SocketAction MyConnection;
 	ServerSocket MyServerSocket;
 	Socket MySocket;
 	boolean isHosted;
 
-	public HexConnector() {
+	public HexConnecter() {
 
 	}
 

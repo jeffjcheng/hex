@@ -10,10 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import game.Game;
-
-import net.IncomingDataHandler;
-import net.HexConnector;
+import core.GameUpdater;
 
 /*
  * This is the primary pre-game UI. It also handles mouse events and passes them into the Game Updater.
@@ -33,19 +30,19 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 	TextField portNum;
 	TextField sendText;
 	TextArea dataText;
-	IncomingDataHandler guiUpdater;
-	Game game;
+	
+	GameUpdater gameUpdater;
+	GraphicsUpdater graphicsUpdater;
 	
 	
-	HexConnector connector; // Only here to test functionality -- should be in "game" class
+	
 
 	//Constructor
-	public Gui(String s,Game game) {
+	public Gui(String s, GameUpdater gameUpdater) {
 		super(s); // construct Frame part of Gui	
-		this.game = game;
+		this.gameUpdater = gameUpdater;
+		this.graphicsUpdater = new GraphicsUpdater(gameUpdater);
 		
-		
-		connector = new HexConnector();
 		setLayout(new FlowLayout());
 		
 		quitButton = new Button("quit");
@@ -78,7 +75,7 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 		sendButton.addActionListener(this);
 		
 		
-		guiUpdater = new IncomingDataHandler(game,this.connector);
+		
 		
 	}
 
@@ -88,27 +85,33 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 		// TODO Auto-generated method stub
 		
 			if(e.getSource() == quitButton){
-				connector.closeConnections();
+				gameUpdater.CloseConnections();
 				System.exit(0);
 			}
 			if(e.getSource() == joinButton){
-				dataText.append("Attempting to join: " + hostName.getText() + " on port: " + portNum.getText());
-				connector.setHosted(false);
-				connector.launch(hostName.getText(), Integer.parseInt(portNum.getText()));
-				guiUpdater.start();
+				dataText.append("Gui::Join Button Clicked");
+				if(gameUpdater.JoinGame(hostName.getText(),Integer.parseInt(portNum.getText()))){
+					this.dataText.append("Game joined successfully");
+					this.joinButton.setEnabled(false);
+					this.hostButton.setEnabled(false);
+				}else{
+					this.dataText.append("Joining game failed!");
+				}
 			}
 			if(e.getSource() == hostButton){
 				System.out.println("Gui::Host Button Clicked");
-				dataText.append("Waiting for connection on port: " + portNum.getText());
-				connector.setHosted(true);
-				connector.launch(hostName.getText(), Integer.parseInt(portNum.getText()));
-				System.out.println("Gui::Connector Launched");
-				guiUpdater.start();
-				System.out.println("Gui::GuiUpdater Thread Started");
+				if(gameUpdater.HostGame(hostName.getText(), Integer.parseInt(portNum.getText()))){
+					this.dataText.append("Game Hosted Successfully");
+					this.joinButton.setEnabled(false);
+					this.hostButton.setEnabled(false);
+				}else{
+					this.dataText.append("Game Host Failed!");
+				}
+				
+				
 			}
 			if((e.getSource() == sendButton)||((e.getSource() == sendText))){
-				game.setMyString("hello");
-				connector.send(game);
+				gameUpdater.SendText(sendText.getText());
 				dataText.append(sendText.getText() + "\n");
 				sendText.setText("");
 			}
@@ -125,7 +128,7 @@ public class Gui extends Frame implements WindowListener, ActionListener{
 	@Override
 	public void windowClosed(WindowEvent arg0) {
 		// TODO Auto-generated method stub
-		
+		System.exit(0);
 	}
 
 
