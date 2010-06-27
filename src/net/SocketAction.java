@@ -22,8 +22,7 @@ class SocketAction extends Thread {
     	
     	//Java is evil...
       outStream = new ObjectOutputStream(socket.getOutputStream());
-      InputStream preInStream = socket.getInputStream();
-      inStream = new ObjectInputStream(preInStream);
+      inStream = new ObjectInputStream(socket.getInputStream());
       System.out.println("SocketAction::ObjectStreams Created");
       
     }
@@ -40,6 +39,8 @@ class SocketAction extends Thread {
     //outStream.println(s);
 	  try {
 		outStream.writeObject(s);
+		outStream.reset();
+		
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
